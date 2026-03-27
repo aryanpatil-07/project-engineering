@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
-import TaskInput from "./TaskInput";
-import FilterBar from "./FilterBar";
-import TaskList from "./TaskList";
+import TaskInput from "./components/TaskInput";
+import FilterBar from "./components/FilterBar";
+import TaskList from "./components/TaskList";
 
 export default function App() {
 	const [tasks, setTasks] = useState([]);

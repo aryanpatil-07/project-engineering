@@ -13,7 +13,7 @@ You will be building a standalone Task Manager. You must strictly follow the req
 
 ## Live Deployments
 
-- Vibe version: ADD YOUR LINK HERE
+- Vibe version: https://project-eng-vibecoded.netlify.app/
 - Pair version: ADD YOUR LINK HERE
 
 ## Comparison Table
