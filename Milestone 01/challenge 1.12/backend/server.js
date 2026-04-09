@@ -20,18 +20,62 @@ app.get('/health', (req, res) => {
 
 /**
  * AI Chat Route
- * This is where the magic happens.
+ * Accepts: { messages: [{ role, content }, ...] }
+ * Returns: { reply: "..." }
  */
+app.get("/", (req, res) => {
+  res.send("Backend is running");
+});
+
 app.post('/chat', async (req, res) => {
-  // TODO: Implement the AI chat route
-  // 1. Extract `messages` from req.body
-  // 2. Read API key from process.env.OPENROUTER_API_KEY
-  // 3. POST to https://openrouter.ai/api/v1/chat/completions
-  //    with Authorization: Bearer <key> and the messages array
-  // 4. Return the AI reply as { reply: "..." }
-  
-  // Placeholder response (will be replaced by student)
-  res.status(501).json({ error: "Method Not Implemented" });
+  try {
+    const { messages } = req.body;
+    const apiKey = process.env.OPENROUTER_API_KEY;
+
+    if (!apiKey) {
+      return res.status(500).json({ error: 'Server misconfiguration: missing OPENROUTER_API_KEY' });
+    }
+
+    if (!Array.isArray(messages) || messages.length === 0) {
+      return res.status(400).json({ error: 'Invalid request: messages must be a non-empty array' });
+    }
+
+    const model = process.env.OPENROUTER_MODEL || 'openai/gpt-4o-mini';
+
+    const aiRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+        // Optional but recommended by OpenRouter:
+        'HTTP-Referer': process.env.APP_URL || 'http://localhost:5500',
+        'X-Title': 'challenge-1.12-ai-chatbot'
+      },
+      body: JSON.stringify({
+        model,
+        messages
+      })
+    });
+
+    const data = await aiRes.json();
+
+    if (!aiRes.ok) {
+      return res.status(aiRes.status).json({
+        error: data?.error?.message || 'OpenRouter request failed'
+      });
+    }
+
+    const reply = data?.choices?.[0]?.message?.content;
+
+    if (!reply) {
+      return res.status(502).json({ error: 'Invalid AI response format' });
+    }
+
+    return res.json({ reply });
+  } catch (error) {
+    console.error('Chat route error:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 app.listen(PORT, () => {
