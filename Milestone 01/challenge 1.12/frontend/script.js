@@ -6,7 +6,7 @@ const messageInput = document.getElementById('messageInput');
 const sendBtn = document.getElementById('sendBtn');
 
 // Local backend for development
-let CHAT_API_URL = 'http://localhost:3000/chat';
+let CHAT_API_URL = 'https://ai-chatbot-backend-s3z5.onrender.com/chat';
 
 // Optional: if you host frontend + backend separately, set this before build/deploy
 // CHAT_API_URL = 'https://your-render-service.onrender.com/chat';

@@ -3,6 +3,7 @@
 ## What I built
 
 A full AI chatbot with:
+
 - Frontend chat UI (`frontend/index.html`, `frontend/script.js`, `frontend/style.css`)
 - Backend Express API (`backend/server.js`) with `POST /chat`
 - Real AI integration via OpenRouter
@@ -26,6 +27,7 @@ If the API call is made from the frontend, users can extract the API key from br
 
 If OpenRouter credits run out, I would switch to **Google Gemini API**.  
 The two required code changes are:
+
 1. Change the API base URL (OpenRouter endpoint → Gemini endpoint)
 2. Change the model name to a Gemini model
 
@@ -33,9 +35,9 @@ The two required code changes are:
 
 ## Live Deployment
 
-- Frontend URL: `https://YOUR-NETLIFY-URL.netlify.app`
-- Backend URL: `https://YOUR-RENDER-SERVICE.onrender.com`
-- Health Check: `https://YOUR-RENDER-SERVICE.onrender.com/health`
+- Frontend URL: `https://dancing-dango-3e8145.netlify.app/`
+- Backend URL: `https://ai-chatbot-backend-s3z5.onrender.com`
+- Health Check: `https://ai-chatbot-backend-s3z5.onrender.com/health`
 
 ## Local setup
 
@@ -43,3 +45,4 @@ The two required code changes are:
 cd backend
 npm install
 npm start
+```
