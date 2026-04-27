@@ -2,24 +2,23 @@
 
 ## Issues Found
 
-List the problems discovered when running invalid_data.sql.
-
-Example:
 - Tasks allowed NULL titles
-- Duplicate emails inserted
-- Invalid priorities accepted
-- Tasks referencing non-existent projects
+- User emails were not unique
+- Task priorities accepted invalid values
+- Tasks could reference projects that did not exist
+- Some required fields like user names and project names were also allowed to be empty
 
 ## Constraints Implemented
 
-Explain what constraints were added.
-
-Example:
-- NOT NULL on task title
-- UNIQUE on user email
-- CHECK on task priority
-- FOREIGN KEY on project_id
+- Added NOT NULL to `users.name`, `users.email`, `projects.project_name`, and `tasks.title` so these required fields always have values
+- Added UNIQUE to `users.email` so no two users can share the same email address
+- Added CHECK to `tasks.priority` so priority must be between 1 and 5
+- Added FOREIGN KEY to `tasks.project_id` so every task must point to a valid project
 
 ## Result
 
-Explain how the database now prevents invalid data as the final input.
+- Valid sample data still inserts successfully
+- The database now rejects tasks with missing titles
+- The database now rejects duplicate user emails
+- The database now rejects invalid priority values like 10
+- The database now rejects tasks that reference non-existent projects
