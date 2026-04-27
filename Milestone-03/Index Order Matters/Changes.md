@@ -14,3 +14,5 @@ The query filters by:
 
 By the **Left-Most Prefix Rule**, a composite index is best used when predicates start from its first column.  
 So `(department, salary)` aligns with this pattern better than `(salary, department)`, especially at larger scale.
+
+Assignment completed.
