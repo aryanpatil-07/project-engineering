@@ -1,53 +1,81 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
+const { serializeUser } = require('../utils/serializers');
 
-// GET all users in the system
 router.get('/', async (req, res) => {
   try {
-    const { rows } = await db.query('SELECT * FROM users');
-    res.json(rows);
+    let query = 'SELECT * FROM users WHERE tenant_id = $1';
+    const params = [req.user.tenant_id];
+
+    if (req.user.role === 'manager') {
+      query += ' AND manager_id = $2';
+      params.push(req.user.id);
+    }
+
+    if (req.user.role === 'user') {
+      query += ' AND id = $2';
+      params.push(req.user.id);
+    }
+
+    const { rows } = await db.query(query, params);
+    res.json(rows.map((row) => serializeUser(row, req.user)).filter(Boolean));
   } catch (err) {
     res.status(500).json({ error: 'Database execution error' });
   }
 });
 
-// GET single user details by ID
 router.get('/:id', async (req, res) => {
   try {
-    const { rows } = await db.query('SELECT * FROM users WHERE id = $1', [req.params.id]);
-    if (rows.length === 0) return res.status(404).json({ error: 'User not found' });
-    res.json(rows[0]);
+    const { rows } = await db.query(
+      'SELECT * FROM users WHERE tenant_id = $1 AND id = $2',
+      [req.user.tenant_id, req.params.id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const safe = serializeUser(rows[0], req.user);
+    if (!safe) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+
+    res.json(safe);
   } catch (err) {
     res.status(500).json({ error: 'Database retrieval error' });
   }
 });
 
-// CREATE a new user
 router.post('/', async (req, res) => {
-  const { name, email } = req.body;
+  const { name, email, role = 'user', manager_id = null, salary = null, ssn = null } = req.body;
+
   try {
     const { rows } = await db.query(
-      'INSERT INTO users (name, email) VALUES ($1, $2) RETURNING *',
-      [name, email]
+      `INSERT INTO users (tenant_id, name, email, role, manager_id, salary, ssn)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       RETURNING *`,
+      [req.user.tenant_id, name, email, role, manager_id, salary, ssn]
     );
-    res.status(201).json(rows[0]);
+
+    res.status(201).json(serializeUser(rows[0], req.user));
   } catch (err) {
     res.status(500).json({ error: 'User creation failed' });
   }
 });
 
-// DELETE user permanently from the system
 router.delete('/:id', async (req, res) => {
   try {
-    // Hard DELETE from users table
-    const { rowCount } = await db.query('DELETE FROM users WHERE id = $1', [req.params.id]);
-    
+    const { rowCount } = await db.query(
+      'DELETE FROM users WHERE tenant_id = $1 AND id = $2',
+      [req.user.tenant_id, req.params.id]
+    );
+
     if (rowCount === 0) {
       return res.status(404).json({ error: 'User not found' });
     }
-    
-    res.json({ message: 'User permanently deleted from LedgerApp' });
+
+    res.json({ message: 'User deleted' });
   } catch (err) {
     res.status(500).json({ error: 'Delete operation failed' });
   }
