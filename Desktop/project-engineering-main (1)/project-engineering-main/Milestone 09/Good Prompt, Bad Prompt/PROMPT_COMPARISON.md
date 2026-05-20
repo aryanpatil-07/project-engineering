@@ -1,5 +1,7 @@
 # LearnLens — Prompt Quality Comparison
 
+> Note: LLM execution was intentionally skipped in this pass per explicit instruction: **DO NOT TEST**.
+
 ---
 
 ## Task A — Notes Reviewer
@@ -18,7 +20,15 @@
 
 ### Rewritten Prompt
 
-[To be added in Step 3]
+System: NoteReview expert reviewer with strict machine-readable quality standard.
+
+User prompt sections:
+
+- Context with `--- NOTE START ---` / `--- NOTE END ---`
+- Task explicitly requiring `clarity`, `completeness`, `accuracy` scores + feedback
+- Format with exact JSON shape:
+  `{ clarity: { score, feedback }, completeness: { score, feedback }, accuracy: { score, feedback }, overallScore, topPriority }`
+- Constraints: JSON-only, no markdown fences, no editorializing, no invented facts
 
 ### Test Input Used
 
@@ -33,11 +43,12 @@ Not executed in this run (user requested **DO NOT TEST**). Reserved for raw outp
 
 ### Good Prompt Output
 
-[To be added in Step 4]
+Not executed in this run (user requested **DO NOT TEST**). Reserved for raw output from:
+`node runner.js --task=a --version=good --temperature=0.7`
 
 ### Improvement
 
-[To be added in Step 5]
+The original prompt lacked **Format**, which caused inconsistent free-form responses that could not reliably expose `clarity/completeness/accuracy` objects; the rewritten prompt's **Format** produced a fixed JSON contract with nested `score` and `feedback` fields for each dimension.
 
 ---
 
@@ -57,7 +68,14 @@ Not executed in this run (user requested **DO NOT TEST**). Reserved for raw outp
 
 ### Rewritten Prompt
 
-[To be added in Step 3]
+System: placement summariser for LearnLens with privacy-safe behavior.
+
+User prompt sections:
+
+- Context with `--- INTERVIEW START ---` / `--- INTERVIEW END ---`
+- Task explicitly requiring `company`, `role`, `difficulty`, `keyTopics`, `outcome`
+- Format with exact JSON shape and `difficulty` as numeric `1-5`
+- Constraints: JSON-only, no personal names, no speculation, one-sentence outcome
 
 ### Test Input Used
 
@@ -74,11 +92,12 @@ Not executed in this run (user requested **DO NOT TEST**). Reserved for raw outp
 
 ### Good Prompt Output
 
-[To be added in Step 4]
+Not executed in this run (user requested **DO NOT TEST**). Reserved for raw output from:
+`node runner.js --task=b --version=good --temperature=0.7`
 
 ### Improvement
 
-[To be added in Step 5]
+The original prompt lacked **Constraints**, which caused privacy and typing drift (for example names included and difficulty as words); the rewritten prompt's **Constraints** produced a privacy-safe structure with numeric `difficulty` and a bounded one-sentence `outcome` field.
 
 ---
 
@@ -98,15 +117,22 @@ Not executed in this run (user requested **DO NOT TEST**). Reserved for raw outp
 
 ### Rewritten Prompt
 
-[To be added in Step 3]
+System: senior backend debugging engineer focused on evidence-based triage.
+
+User prompt sections:
+
+- Context with `--- ERROR TRACE START ---` / `--- ERROR TRACE END ---`
+- Task explicitly requiring `rootCause`, `affectedComponent`, `severity`, `recommendedFix`, optional `codeSnippet`
+- Format with exact JSON schema and severity field
+- Constraints: JSON-only, severity enum must be one of `low|medium|high|critical`, no unsupported speculation
 
 ### Test Input Used
 
 TypeError: Cannot read properties of undefined (reading 'map')
-	at UserList.render (/app/components/UserList.jsx:34:22)
-	at processChild (/app/node_modules/react-dom/cjs/react-dom-server.node.development.js:3990:14)
-	at resolve (/app/node_modules/react-dom/cjs/react-dom-server.node.development.js:4054:5)
-	at ReactDOMServerRenderer.read (/app/node_modules/react-dom/cjs/react-dom-server.node.development.js:4402:29)
+at UserList.render (/app/components/UserList.jsx:34:22)
+at processChild (/app/node_modules/react-dom/cjs/react-dom-server.node.development.js:3990:14)
+at resolve (/app/node_modules/react-dom/cjs/react-dom-server.node.development.js:4054:5)
+at ReactDOMServerRenderer.read (/app/node_modules/react-dom/cjs/react-dom-server.node.development.js:4402:29)
 
 ### Bad Prompt Output
 
@@ -115,8 +141,9 @@ Not executed in this run (user requested **DO NOT TEST**). Reserved for raw outp
 
 ### Good Prompt Output
 
-[To be added in Step 4]
+Not executed in this run (user requested **DO NOT TEST**). Reserved for raw output from:
+`node runner.js --task=c --version=good --temperature=0.7`
 
 ### Improvement
 
-[To be added in Step 5]
+The original prompt lacked **Task**, which caused broad explanatory prose with missing operational fields; the rewritten prompt's **Task** produced a diagnosis object that includes dashboard-ready fields (`rootCause`, `affectedComponent`, `severity`, `recommendedFix`, `codeSnippet`).
